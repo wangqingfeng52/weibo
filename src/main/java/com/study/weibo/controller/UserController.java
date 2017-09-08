@@ -2,6 +2,7 @@ package com.study.weibo.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.study.weibo.domain.User;
+import com.study.weibo.redis.RedisService;
 import com.study.weibo.service.UserService;
 import com.study.weibo.util.MD5;
 import com.study.weibo.util.Oid;
@@ -10,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
@@ -24,6 +24,10 @@ import java.util.Map;
  */
 @RestController
 public class UserController {
+
+
+    @Autowired
+    RedisService redisService;
 
     @Autowired
     private Oid oid;
@@ -73,7 +77,7 @@ public class UserController {
     }
 
     @PostMapping(value="login")
-    public String login(HttpServletRequest req , @RequestParam(value = "username" ,required = true)
+    public String login( @RequestParam(value = "username" ,required = true)
             String userName, @RequestParam(value = "password" ,required = true)
             String password){
 
@@ -98,7 +102,7 @@ public class UserController {
         }
 
 
-        Object o = req.getSession().getAttribute(user.getId()+"");
+        Object o = redisService.get(user.getId()+"");
         //如果缓存中存在
         if(o!=null&&o.toString().length()>0){
             return o.toString();
@@ -114,7 +118,7 @@ public class UserController {
         user.setLoginTime(loginTime);
 
 
-        req.getSession().setAttribute(user.getId()+"",JSON.toJSONString(returnMap));
+        redisService.set(user.getId()+"",JSON.toJSONString(returnMap));
 
         return JSON.toJSONString(returnMap);
     }

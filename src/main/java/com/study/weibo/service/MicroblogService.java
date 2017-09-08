@@ -2,6 +2,9 @@ package com.study.weibo.service;
 
 
 import com.study.weibo.domain.Microblog;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 @SuppressWarnings("all")
 /**
@@ -15,4 +18,6 @@ public interface MicroblogService {
     void updateBlog(Microblog blog) throws Throwable;
 
     void deleteBlog(Long articleId) throws Throwable;
+
+    List<Microblog> getBlogByIDAndPage(long l, Pageable page);
 }

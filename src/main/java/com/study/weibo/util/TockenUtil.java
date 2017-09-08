@@ -2,19 +2,23 @@ package com.study.weibo.util;
 
 
 import com.alibaba.fastjson.JSON;
+import com.study.weibo.redis.RedisService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
  * Created by Administrator on 2017/9/7 0007.
  */
-
+@Component
 public class TockenUtil {
 
-    public static boolean isToken(HttpServletRequest req, String userid, String token){
-        Object o = req.getSession().getAttribute(userid);
+    @Autowired
+    RedisService redisService;
+
+    public boolean isToken(String userid, String token){
+        Object o = redisService.get(userid);
         boolean flag = true;
         if(o==null){
             flag = false;

@@ -6,9 +6,9 @@ import com.study.weibo.service.MicroblogService;
 import com.study.weibo.util.TimeTool;
 import com.study.weibo.util.TockenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
 @SuppressWarnings("all")
@@ -19,21 +19,16 @@ import java.util.*;
 public class MicroblogController {
 
     @Autowired
+    private TockenUtil tockenUtil;
+
+    @Autowired
     private MicroblogService microblogService;
 
     @PostMapping(value = "create")
-    public String register(HttpServletRequest req , @RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
+    public String register(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
             String token, @RequestParam(value = "title",required = true) String title, @RequestParam(value = "content") String content) {
 
-
-        Enumeration<String> attributeNames = req.getSession().getAttributeNames();
-        while(attributeNames.hasMoreElements()){
-            String s = attributeNames.nextElement();
-            System.out.println(req.getSession().getAttribute(s)==null?"":req.getSession().getAttribute(s).toString());
-        }
-
-        Object o = req.getSession().getAttribute(userid);
-        boolean flag = TockenUtil.isToken(req,userid,token);
+        boolean flag = tockenUtil.isToken(userid,token);
 
         String returnStr = "";
         Map<String,Object> returnMap = new HashMap<String,Object>();
@@ -64,6 +59,7 @@ public class MicroblogController {
             returnStr = JSON.toJSONString(returnMap);
             return returnStr;
         } catch (Throwable throwable) {
+            throwable.printStackTrace();
             returnMap.put("code","03");
             returnMap.put("data","");
             returnStr = JSON.toJSONString(returnMap);
@@ -100,10 +96,10 @@ public class MicroblogController {
 
 
     @PutMapping(value="update")
-    public String updateBlog(HttpServletRequest req , @RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
+    public String updateBlog(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
             String token, @RequestParam(value = "articieId",required = true) Long articleId ,@RequestParam(value = "title",required = true) String title, @RequestParam(value = "content") String content){
 
-        boolean flag = TockenUtil.isToken(req,userid,token);
+        boolean flag = tockenUtil.isToken(userid,token);
         Map<String,Object> returnMap = new HashMap<String,Object>();
 
  /*       {"articleId": 11, "update_time": "2016-09-06 12:08:10", "code": "00", "userid": 3}*/
@@ -137,11 +133,11 @@ public class MicroblogController {
     }
 
     @PostMapping(value="delete")
-    public String delBlog(HttpServletRequest req , @RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
+    public String delBlog(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
             String token, @RequestParam(value = "articieId",required = true) long articleId ){
         //建议改成 1个1个删除
 
-        boolean flag = TockenUtil.isToken(req,userid,token);
+        boolean flag = tockenUtil.isToken(userid,token);
         Map<String,Object> returnMap = new HashMap<String,Object>();
         returnMap.put("userid",userid);
         returnMap.put("articieId",articleId);
@@ -167,4 +163,34 @@ public class MicroblogController {
 
         return "";
     }
+
+
+    @PostMapping(value="getBlogsOfUser")
+    public String getBlogsContent(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
+            String token, @RequestParam(value = "offset",required = true) int offset,@RequestParam(value = "lines",required = true) int lines){
+        boolean flag = tockenUtil.isToken(userid,token);
+        Map<String,Object> returnMap = new HashMap<String,Object>();
+        returnMap.put("userid",userid);
+
+        if(flag){
+            Pageable page =new PageRequest(offset,lines);
+            try{
+                List<Microblog> blogByIDAndPage = microblogService.getBlogByIDAndPage(Long.parseLong(userid), page);
+                returnMap.put("data",blogByIDAndPage);
+                returnMap.put("code","00");
+                return JSON.toJSONString(returnMap);
+            }catch (Throwable throwable){
+                throwable.printStackTrace();
+            }
+
+        }
+        returnMap.put("code","03");
+        returnMap.put("data","");
+
+        return JSON.toJSONString(returnMap);
+    }
+
+
+
+
 }

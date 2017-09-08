@@ -3,7 +3,11 @@ package com.study.weibo.service.impl;
 import com.study.weibo.domain.Microblog;
 import com.study.weibo.repository.MicroblogRepository;
 import com.study.weibo.service.MicroblogService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @SuppressWarnings("all")
 /**
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MicroblogServiceImpl implements MicroblogService {
 
+    @Autowired
     private MicroblogRepository microblogRepository;
 
     @Override
@@ -31,6 +36,11 @@ public class MicroblogServiceImpl implements MicroblogService {
 
     @Override
     public void deleteBlog(Long articleId) throws Throwable{
+        microblogRepository.delete(articleId);
+    }
 
+    @Override
+    public List<Microblog> getBlogByIDAndPage(long userID, Pageable page) {
+        return microblogRepository.getMicroblogsByOwnerAndPageAble(userID, page);
     }
 }
