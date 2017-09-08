@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface UserRepository extends JpaRepository<User,Long>{
 
-    public User getPersonByUserName(String userName);
+    public User getUserByUserNameAndPassword(String userName,String password);
+
+    public User getUserByUserName(String userName);
 
 }

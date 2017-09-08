@@ -3,11 +3,16 @@ package com.study.weibo.controller;
 import com.alibaba.fastjson.JSON;
 import com.study.weibo.domain.User;
 import com.study.weibo.service.UserService;
+import com.study.weibo.util.MD5;
 import com.study.weibo.util.Oid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,8 +33,8 @@ public class UserController {
 
 
     @PostMapping(value="register")
-    public String register(@Param(value = "username") String userName,@Param(value = "password")
-            String password,@Param(value = "email") String email){
+    public String register(@RequestParam(value = "username" ,required = true) String userName,@RequestParam(value = "password",required = true)
+            String password,@RequestParam(value = "email" ,required = true) String email){
 
 
         String returnStr = "";
@@ -41,6 +46,14 @@ public class UserController {
         user.setEmail(email);
         user.setPassword(password);
 
+
+        if(userService.isExit(user)){
+            returnMap.put("code","01");
+            returnMap.put("userid",-1);
+            returnStr = JSON.toJSONString(returnMap);
+            return returnStr;
+        }
+
         boolean checkFlag = userService.checkUserData(user);
         if(!checkFlag){
             returnMap.put("code","02");
@@ -50,7 +63,7 @@ public class UserController {
         }
 
         userService.createFillUser(user);
-        userService.md5Email(user);
+        userService.md5Password(user);
         long id =  userService.addUser(user);
 
         returnMap.put("code","02");
@@ -60,14 +73,22 @@ public class UserController {
     }
 
     @PostMapping(value="login")
-    public String login(@Param(value = "username") String userName,@Param(value = "password")
+    public String login(HttpServletRequest req , @RequestParam(value = "username" ,required = true)
+            String userName, @RequestParam(value = "password" ,required = true)
             String password){
-        User user = userService.getUser(userName);
+
+        String returnStr = "";
         Map<String,Object> returnMap = new HashMap<String,Object>();
         returnMap.put("login_time",new Date().getTime());
-
         long loginTime = new Date().getTime();
-        String returnStr = "";
+        User user = null;
+        try {
+            user = userService.getPersonByUserNameAndPassword(userName, MD5.MD5_32bit(password));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         if(user==null){
             returnMap.put("code","03");
             returnMap.put("userid",-1);
@@ -76,13 +97,26 @@ public class UserController {
             return returnStr;
         }
 
+
+        Object o = req.getSession().getAttribute(user.getId()+"");
+        //如果缓存中存在
+        if(o!=null&&o.toString().length()>0){
+            return o.toString();
+        }
+
+
+        String token =  oid.getOid();
+
         returnMap.put("code","00");
         returnMap.put("userid",user.getId());
-        returnMap.put("token", oid.getOid());
+        returnMap.put("token", token);
         returnMap.put("login_time",loginTime);
         user.setLoginTime(loginTime);
 
-        return JSON.toJSONString(user);
+
+        req.getSession().setAttribute(user.getId()+"",JSON.toJSONString(returnMap));
+
+        return JSON.toJSONString(returnMap);
     }
 
 }

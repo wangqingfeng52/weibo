@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class Microblog {
 
     //主键
-    private Long id;
+    private Long articleId;
 
     //标题
     private String title;
@@ -20,30 +20,30 @@ public class Microblog {
     private String content;
 
     //创建人
-    private Long createUserID;
+    private Long owner;
 
     //创建时间
-    private Long createTime;
+    private Long posted_on;
 
     //最后一次修改时间
-    private Long updateTime;
+    private Long update_time;
 
     public Microblog() {
     }
 
-
     @Id
     @GeneratedValue
-    public Long getId() {
-        return id;
+    @Column(name="id")
+    public Long getArticleId() {
+        return articleId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setArticleId(Long articleId) {
+        this.articleId = articleId;
     }
 
 
-    @Column(name = "TITLE")
+    @Column(name = "TITLE",columnDefinition="text")
     public String getTitle() {
         return title;
     }
@@ -53,7 +53,7 @@ public class Microblog {
     }
 
 
-    @Column(name = "CONTENT")
+    @Column(name = "CONTENT",columnDefinition = "text")
     public String getContent() {
         return content;
     }
@@ -62,44 +62,32 @@ public class Microblog {
         this.content = content;
     }
 
-
     @Column(name = "CREATE_USER_ID")
-    public Long getCreateUserID() {
-        return createUserID;
+    public Long getOwner() {
+        return owner;
     }
 
-    public void setCreateUserID(Long createUserID) {
-        this.createUserID = createUserID;
+    public void setOwner(Long owner) {
+        this.owner = owner;
     }
 
     @Column(name = "CREATE_TIME")
-    public Long getCreateTime() {
-        return createTime;
+    public Long getPosted_on() {
+        return posted_on;
     }
 
-    public void setCreateTime(Long createTime) {
-        this.createTime = createTime;
+    public void setPosted_on(Long posted_on) {
+        this.posted_on = posted_on;
     }
 
     @Column(name = "UPDATE_TIME")
-    public Long getUpdateTime() {
-        return updateTime;
+    public Long getUpdate_time() {
+        return update_time;
     }
 
-    public void setUpdateTime(Long updateTime) {
-        this.updateTime = updateTime;
+    public void setUpdate_time(Long update_time) {
+        this.update_time = update_time;
     }
 
-    @Override
-    public String toString() {
-        return "Microblog{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", content='" + content + '\'' +
-                ", createUserID=" + createUserID +
-                ", createTime=" + createTime +
-                ", updateTime=" + updateTime +
-                '}';
-    }
 }
 

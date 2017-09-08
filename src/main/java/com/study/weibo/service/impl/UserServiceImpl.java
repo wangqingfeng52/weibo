@@ -42,7 +42,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isExit(User user) {
-
+        User u = userRepository.getUserByUserName(user.getUserName());
+        if(u==null){
+            return true;
+        }
         return false;
     }
 
@@ -59,10 +62,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void md5Email(User user) {
-        String email = user.getEmail();
+    public void md5Password(User user) {
+        String password = user.getPassword();
         try {
-            user.setEmail(MD5.MD5_32bit(email));
+            user.setPassword(MD5.MD5_32bit(password));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -71,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUser(String userName) {
-        return userRepository.getPersonByUserName(userName);
+    public User getPersonByUserNameAndPassword(String userName,String password) {
+        return userRepository.getUserByUserNameAndPassword(userName,password);
     }
 }

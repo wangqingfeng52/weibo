@@ -28,9 +28,17 @@ public class TimeTool {
         return getDateFormat().format(new Date());
     }
 
+    public static String getLongDate(long time) {
+        return getDateFormat().format(new Date(time));
+    }
+
 
     public static String getCurDate() {
         return getDateFormat().format(new Date()).substring(0, 10);
+    }
+
+    public static String getCurDate(long time) {
+        return getDateFormat().format(new Date(time)).substring(0, 10);
     }
 
 }

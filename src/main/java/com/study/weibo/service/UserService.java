@@ -15,7 +15,7 @@ public interface UserService {
 
     long addUser(User user);
 
-    void md5Email(User user);
+    void md5Password(User user);
 
-    User getUser(String userName);
+    public User getPersonByUserNameAndPassword(String userName,String password);
 }
