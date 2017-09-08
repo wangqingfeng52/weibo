@@ -11,10 +11,10 @@ import java.util.List;
 /**
  * Created by Administrator on 2017/9/5 0005.
  */
-public interface MicroblogRepository extends JpaRepository<Microblog,Long>{
+public interface MicroblogRepository extends JpaRepository<Microblog,Long>,UserDealBlogRepository{
 
     public List<Microblog> getMicroblogsByArticleIdContains(List<Long> ids);
 
-    @Query("SELECT blog from Microblog blog where blog.owner =?1 ")
+    @Query("SELECT blog from Microblog blog where blog.owner =?1")
     public List<Microblog> getMicroblogsByOwnerAndPageAble(long userid, Pageable pageable);
 }

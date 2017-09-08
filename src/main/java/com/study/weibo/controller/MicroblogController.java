@@ -134,17 +134,34 @@ public class MicroblogController {
 
     @PostMapping(value="delete")
     public String delBlog(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
-            String token, @RequestParam(value = "articieId",required = true) long articleId ){
+            String token, @RequestParam(value = "articieId",required = true) String articleIds ){
         //建议改成 1个1个删除
 
         boolean flag = tockenUtil.isToken(userid,token);
         Map<String,Object> returnMap = new HashMap<String,Object>();
         returnMap.put("userid",userid);
-        returnMap.put("articieId",articleId);
+        returnMap.put("articieId",articleIds);
         /*{"articleId": [1, 2, 3], "code": "00", "userid": 1}*/
+        if(articleIds.startsWith("[")){
+            articleIds = articleIds.substring(1,articleIds.length());
+        }
+        if(articleIds.endsWith("]")){
+            articleIds = articleIds.substring(0,articleIds.length()-1);
+        }
+
+        String[] splits = articleIds.split(",");
+
+
+        List<Microblog> lists = new ArrayList<Microblog>();
+
+        for(String ids : splits){
+            Microblog blog = new Microblog();
+            blog.setArticleId(Long.parseLong(ids.trim()));
+            lists.add(blog);
+        }
         if(flag){
             try {
-                microblogService.deleteBlog(articleId);
+                microblogService.deleteBlog(lists);
                 returnMap.put("code","00");
                 return JSON.toJSONString(returnMap);
             } catch (Throwable throwable) {
@@ -161,6 +178,7 @@ public class MicroblogController {
     @GetMapping(value="getBlogsContent")
     public String getBlogsContent(@RequestParam(value = "articieId",required = true) String articleIds){
 
+        microblogService.getBlogByManyID(articleIds);
         return "";
     }
 

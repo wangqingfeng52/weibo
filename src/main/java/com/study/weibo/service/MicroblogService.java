@@ -17,7 +17,9 @@ public interface MicroblogService {
 
     void updateBlog(Microblog blog) throws Throwable;
 
-    void deleteBlog(Long articleId) throws Throwable;
+    void deleteBlog(List<Microblog> microblogs) throws Throwable;
 
     List<Microblog> getBlogByIDAndPage(long l, Pageable page);
+
+    void getBlogByManyID(String articleIds);
 }
