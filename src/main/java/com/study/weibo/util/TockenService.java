@@ -5,20 +5,22 @@ import com.alibaba.fastjson.JSON;
 import com.study.weibo.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+@SuppressWarnings("ALL")
 /**
  * Created by Administrator on 2017/9/7 0007.
  */
-@Component
-public class TockenUtil {
+@Service
+public class TockenService {
 
     @Autowired
-    RedisService redisService;
+    private RedisService redisService;
 
     public boolean isToken(String userid, String token){
-        Object o = redisService.get(userid);
+        Object o = redisService.get(Context.USER_BLOG+userid);
         boolean flag = true;
         if(o==null){
             flag = false;
@@ -36,5 +38,14 @@ public class TockenUtil {
         }
 
         return flag;
+    }
+
+
+    public void putToken(String userid,String token,long timeLimit){
+        redisService.set(Context.USER_BLOG+userid,token,timeLimit);
+    }
+
+    public Object getToken(String userid){
+        return  redisService.get(Context.USER_LOGIN+userid);
     }
 }

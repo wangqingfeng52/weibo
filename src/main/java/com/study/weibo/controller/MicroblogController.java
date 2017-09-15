@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.study.weibo.domain.Microblog;
 import com.study.weibo.service.MicroblogService;
 import com.study.weibo.util.TimeTool;
-import com.study.weibo.util.TockenUtil;
+import com.study.weibo.util.TockenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,16 +19,16 @@ import java.util.*;
 public class MicroblogController {
 
     @Autowired
-    private TockenUtil tockenUtil;
+    private TockenService tockenService;
 
     @Autowired
     private MicroblogService microblogService;
 
     @PostMapping(value = "create")
-    public String register(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
+    public String create(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
             String token, @RequestParam(value = "title",required = true) String title, @RequestParam(value = "content",required = true) String content) {
 
-        boolean flag = tockenUtil.isToken(userid,token);
+        boolean flag = tockenService.isToken(userid,token);
 
         String returnStr = "";
         Map<String,Object> returnMap = new HashMap<String,Object>();
@@ -41,22 +41,23 @@ public class MicroblogController {
         }
 
 
-        Microblog bolg = new Microblog();
-        bolg.setOwner(Long.parseLong(userid));
-        bolg.setTitle(title);
-        bolg.setContent(content);
+        Microblog blog = new Microblog();
+        blog.setOwner(Long.parseLong(userid));
+        blog.setTitle(title);
+        blog.setContent(content);
         long time = new Date().getTime();
-        bolg.setPosted_on(TimeTool.getLongDate(time));
-        bolg.setUpdate_time(TimeTool.getLongDate(time));
+        blog.setPosted_on(TimeTool.getLongDate(time));
+        blog.setUpdate_time(TimeTool.getLongDate(time));
 
         try {
-            microblogService.addBlog(bolg);
+            microblogService.addBlog(blog);
             returnMap.put("code","00");
             Map<String,String> innerMap = new HashMap<String,String>();
             innerMap.put("content",content);
             innerMap.put("title",title);
             returnMap.put("data",innerMap);
             returnStr = JSON.toJSONString(returnMap);
+
             return returnStr;
         } catch (Throwable throwable) {
             throwable.printStackTrace();
@@ -86,7 +87,6 @@ public class MicroblogController {
             }
         } catch (Throwable throwable) {
             throwable.printStackTrace();
-
         }
 
         returnMap.put("code","03");
@@ -99,7 +99,7 @@ public class MicroblogController {
     public String updateBlog(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
             String token, @RequestParam(value = "articieId",required = true) Long articleId ,@RequestParam(value = "title",required = true) String title, @RequestParam(value = "content",required = true) String content){
 
-        boolean flag = tockenUtil.isToken(userid,token);
+        boolean flag = tockenService.isToken(userid,token);
         Map<String,Object> returnMap = new HashMap<String,Object>();
 
  /*       {"articleId": 11, "update_time": "2016-09-06 12:08:10", "code": "00", "userid": 3}*/
@@ -137,7 +137,7 @@ public class MicroblogController {
             String token, @RequestParam(value = "articieId",required = true) String articleIds ){
         //建议改成 1个1个删除
 
-        boolean flag = tockenUtil.isToken(userid,token);
+        boolean flag = tockenService.isToken(userid,token);
         Map<String,Object> returnMap = new HashMap<String,Object>();
         returnMap.put("userid",userid);
         returnMap.put("articieId",articleIds);
@@ -163,6 +163,7 @@ public class MicroblogController {
             try {
                 microblogService.deleteBlog(lists);
                 returnMap.put("code","00");
+
                 return JSON.toJSONString(returnMap);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
@@ -189,13 +190,13 @@ public class MicroblogController {
 
     @PostMapping(value="getBlogsOfUser")
     public String getBlogsContent(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
-            String token, @RequestParam(value = "offset",required = true) int offset,@RequestParam(value = "lines",required = true) int lines){
-        boolean flag = tockenUtil.isToken(userid,token);
+            String token, @RequestParam(value = "offset",required = true) int pagenumber,@RequestParam(value = "lines",required = true) int lines){
+        boolean flag = tockenService.isToken(userid,token);
         Map<String,Object> returnMap = new HashMap<String,Object>();
         returnMap.put("userid",userid);
 
         if(flag){
-            Pageable page =new PageRequest(offset,lines);
+            Pageable page =new PageRequest(pagenumber,lines);
             try{
                 List<Microblog> blogByIDAndPage = microblogService.getBlogByIDAndPage(Long.parseLong(userid), page);
                 returnMap.put("data",blogByIDAndPage);
@@ -211,8 +212,5 @@ public class MicroblogController {
 
         return JSON.toJSONString(returnMap);
     }
-
-
-
 
 }

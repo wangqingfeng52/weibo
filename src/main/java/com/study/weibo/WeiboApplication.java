@@ -1,5 +1,6 @@
 package com.study.weibo;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.embedded.ConfigurableEmbeddedServletContainer;
@@ -10,7 +11,9 @@ import org.springframework.context.annotation.Bean;
 public class WeiboApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(WeiboApplication.class, args);
+
 	}
 /*
 	@Bean

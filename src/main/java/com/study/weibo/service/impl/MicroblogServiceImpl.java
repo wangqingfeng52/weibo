@@ -1,8 +1,11 @@
 package com.study.weibo.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.study.weibo.domain.Microblog;
 import com.study.weibo.repository.MicroblogRepository;
 import com.study.weibo.service.MicroblogService;
+import com.study.weibo.util.BlogCacheService;
+import com.study.weibo.util.Context;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,29 +25,70 @@ public class MicroblogServiceImpl implements MicroblogService {
     @Autowired
     private MicroblogRepository microblogRepository;
 
+    @Autowired
+    private BlogCacheService blogCacheService;
+
     @Override
     public void addBlog(Microblog bolg) throws Throwable{
         microblogRepository.save(bolg);
+        if(Context.REDIS_CACHE_BLOG){
+            blogCacheService.saveBlog(bolg);
+        }
     }
+
 
     @Override
     public Microblog getBlogByID(Long articieId) throws Throwable{
-        return microblogRepository.getOne(articieId);
+        if(Context.REDIS_CACHE_BLOG){
+            Object o =blogCacheService.getBlogByID(articieId);
+            if(o!=null&&o.toString().length()>0){
+                 try{
+                     Microblog blog = JSON.parseObject( o.toString(),Microblog.class);
+                     return blog;
+                 }catch (Exception e){
+                     e.printStackTrace();
+                 }
+            }
+        }
+        Microblog one = microblogRepository.getOne(articieId);
+        if(Context.REDIS_CACHE_BLOG){
+            blogCacheService.saveBlog(one);
+        }
+        return one;
     }
 
     @Override
     public void updateBlog(Microblog blog) throws Throwable {
         microblogRepository.save(blog);
+        if(Context.REDIS_CACHE_BLOG){
+            blogCacheService.saveBlog(blog);
+        }
     }
 
     @Override
     public void deleteBlog(List<Microblog> microblogs) throws Throwable{
         microblogRepository.delete(microblogs);
+        if(Context.REDIS_CACHE_BLOG){
+            for(Microblog bolg :microblogs){
+                blogCacheService.deleteBlogByID(bolg);
+            }
+        }
     }
 
     @Override
-    public List<Microblog> getBlogByIDAndPage(long userID, Pageable page) {
-        return microblogRepository.getMicroblogsByOwnerAndPageAble(userID, page);
+    public List<Microblog> getBlogByIDAndPage(long userID, Pageable page) throws Throwable{
+        if(Context.REDIS_CACHE_BLOG){
+            List<Microblog> blogByUserAndPage = blogCacheService.getBlogByUserAndPage(userID, page);
+            return blogByUserAndPage;
+        }
+        List<Microblog> blogs = microblogRepository.getMicroblogsByOwnerAndPageAble(userID, page);
+        if(blogs!=null && blogs.size()>0 && Context.REDIS_CACHE_BLOG){
+            for(Microblog bolg :blogs){
+                blogCacheService.saveBlog(bolg);
+            }
+        }
+
+        return blogs;
     }
 
     @Override
@@ -54,10 +98,34 @@ public class MicroblogServiceImpl implements MicroblogService {
 
         String[] splits = split1[1].split(Pattern.quote(","));
         List<Long> ids = new ArrayList<Long>();
+        List<Microblog> caches = new ArrayList<Microblog>();
         for(String sid : splits){
             ids.add(Long.parseLong(sid));
+            if(Context.REDIS_CACHE_BLOG){
+                Object o = blogCacheService.getBlogByID(Long.parseLong(sid));
+                if(o!=null&&o.toString().length()>0){
+                    try{
+                        Microblog microblog = JSON.parseObject(o.toString(), Microblog.class);
+                        caches.add(microblog);
+                        ids.remove(Long.parseLong(sid));
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
 
-        return microblogRepository.getBlogs(ids);
+
+
+        List<Microblog> blogs = microblogRepository.getBlogs(ids);
+        if(blogs!=null && Context.REDIS_CACHE_BLOG){
+            for(Microblog blog : blogs){
+                blogCacheService.saveBlog(blog);
+            }
+        }
+        blogs.addAll(caches);
+        return blogs;
     }
+
+
 }

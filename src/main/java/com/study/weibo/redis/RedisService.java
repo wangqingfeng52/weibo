@@ -107,6 +107,12 @@ public class RedisService {
         hash.put(key,hashKey,value);
     }
 
+    public void hmDel(String key, Object hashKey){
+        HashOperations<String, Object, Object> hash = redisTemplate.opsForHash();
+        hash.delete(key,hashKey);
+    }
+
+
     /**
      * 哈希获取数据
      * @param key
@@ -116,6 +122,12 @@ public class RedisService {
     public Object hmGet(String key, Object hashKey){
         HashOperations<String, Object, Object>  hash = redisTemplate.opsForHash();
         return hash.get(key,hashKey);
+    }
+
+
+    public Object hmGetAll(String key){
+        HashOperations<String, Object, Object>  hash = redisTemplate.opsForHash();
+        return hash.values(key);
     }
 
     /**

@@ -4,10 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.study.weibo.domain.User;
 import com.study.weibo.redis.RedisService;
 import com.study.weibo.service.UserService;
-import com.study.weibo.util.MD5;
-import com.study.weibo.util.Oid;
+import com.study.weibo.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,13 +28,17 @@ public class UserController {
 
 
     @Autowired
-    RedisService redisService;
+    private TockenService tockenService;
 
     @Autowired
     private Oid oid;
 
     @Autowired
     private UserService userService;
+
+
+    @Value("${redis.time.limit}")
+    private Long REDIS_TIME_LIMIT;
 
 
     @PostMapping(value="register")
@@ -105,7 +109,10 @@ public class UserController {
         }
 
 
-        Object o = redisService.get(user.getId()+"");
+
+
+
+        Object o = tockenService.getToken(user.getId()+"");
         //如果缓存中存在
         if(o!=null&&o.toString().length()>0){
             return o.toString();
@@ -120,8 +127,7 @@ public class UserController {
         returnMap.put("login_time",loginTime);
         user.setLoginTime(loginTime);
 
-
-        redisService.set(user.getId()+"",JSON.toJSONString(returnMap));
+        tockenService.putToken(user.getId()+"",JSON.toJSONString(returnMap),REDIS_TIME_LIMIT);
 
         return JSON.toJSONString(returnMap);
     }

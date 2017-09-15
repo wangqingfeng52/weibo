@@ -19,7 +19,8 @@ public interface MicroblogService {
 
     void deleteBlog(List<Microblog> microblogs) throws Throwable;
 
-    List<Microblog> getBlogByIDAndPage(long l, Pageable page);
+    List<Microblog> getBlogByIDAndPage(long l, Pageable page) throws Throwable;
 
     List<Microblog> getBlogByManyID(String articleIds);
+
 }
