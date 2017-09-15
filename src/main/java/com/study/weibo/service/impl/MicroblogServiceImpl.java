@@ -48,16 +48,16 @@ public class MicroblogServiceImpl implements MicroblogService {
     }
 
     @Override
-    public void getBlogByManyID(String articleIds) {
-        String[] splits = articleIds.split(Pattern.quote(","));
+    public List<Microblog> getBlogByManyID(String articleIds) {
+        //articleIds=1,2,3
+        String[] split1 = articleIds.split(Pattern.quote("="));
+
+        String[] splits = split1[1].split(Pattern.quote(","));
         List<Long> ids = new ArrayList<Long>();
         for(String sid : splits){
             ids.add(Long.parseLong(sid));
         }
 
-        List<Microblog> blogs = microblogRepository.getBlogs(ids);
-        System.out.println(blogs.size());
-
-        //Arrays.asList(a)
+        return microblogRepository.getBlogs(ids);
     }
 }

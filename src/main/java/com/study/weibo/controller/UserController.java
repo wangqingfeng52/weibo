@@ -7,6 +7,7 @@ import com.study.weibo.service.UserService;
 import com.study.weibo.util.MD5;
 import com.study.weibo.util.Oid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -51,7 +52,7 @@ public class UserController {
         user.setPassword(password);
 
 
-        if(userService.isExit(user)){
+        if(!userService.isExit(user)){
             returnMap.put("code","01");
             returnMap.put("userid",-1);
             returnStr = JSON.toJSONString(returnMap);
@@ -70,7 +71,7 @@ public class UserController {
         userService.md5Password(user);
         long id =  userService.addUser(user);
 
-        returnMap.put("code","02");
+        returnMap.put("code","00");
         returnMap.put("userid",id);
         returnStr = JSON.toJSONString(returnMap);
         return returnStr;
@@ -83,11 +84,13 @@ public class UserController {
 
         String returnStr = "";
         Map<String,Object> returnMap = new HashMap<String,Object>();
-        returnMap.put("login_time",new Date().getTime());
+
         long loginTime = new Date().getTime();
+        returnMap.put("login_time",loginTime);
+
         User user = null;
         try {
-            user = userService.getPersonByUserNameAndPassword(userName, MD5.MD5_32bit(password));
+            user = userService.getUserByUserNameAndPassword(userName, MD5.MD5_32bit(password));
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

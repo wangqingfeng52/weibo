@@ -26,7 +26,7 @@ public class MicroblogController {
 
     @PostMapping(value = "create")
     public String register(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
-            String token, @RequestParam(value = "title",required = true) String title, @RequestParam(value = "content") String content) {
+            String token, @RequestParam(value = "title",required = true) String title, @RequestParam(value = "content",required = true) String content) {
 
         boolean flag = tockenUtil.isToken(userid,token);
 
@@ -46,8 +46,8 @@ public class MicroblogController {
         bolg.setTitle(title);
         bolg.setContent(content);
         long time = new Date().getTime();
-        bolg.setPosted_on(time);
-        bolg.setUpdate_time(time);
+        bolg.setPosted_on(TimeTool.getLongDate(time));
+        bolg.setUpdate_time(TimeTool.getLongDate(time));
 
         try {
             microblogService.addBlog(bolg);
@@ -97,7 +97,7 @@ public class MicroblogController {
 
     @PutMapping(value="update")
     public String updateBlog(@RequestParam(value = "userid" ,required = true) String userid, @RequestParam(value = "token" ,required = true)
-            String token, @RequestParam(value = "articieId",required = true) Long articleId ,@RequestParam(value = "title",required = true) String title, @RequestParam(value = "content") String content){
+            String token, @RequestParam(value = "articieId",required = true) Long articleId ,@RequestParam(value = "title",required = true) String title, @RequestParam(value = "content",required = true) String content){
 
         boolean flag = tockenUtil.isToken(userid,token);
         Map<String,Object> returnMap = new HashMap<String,Object>();
@@ -114,7 +114,7 @@ public class MicroblogController {
                 if (blog != null) {
                     blog.setTitle(title);
                     blog.setContent(content);
-                    blog.setUpdate_time(updateTime);
+                    blog.setUpdate_time(TimeTool.getLongDate(updateTime));
 
                     microblogService.updateBlog(blog);
 
@@ -175,11 +175,15 @@ public class MicroblogController {
     }
 
 
-    @GetMapping(value="getBlogsContent")
-    public String getBlogsContent(@RequestParam(value = "articieId",required = true) String articleIds){
+    @GetMapping(value="getBlogsContent/{articieId}")
+    public String getBlogsContent(@PathVariable(value = "articieId",required = true) String articleIds){
 
-        microblogService.getBlogByManyID(articleIds);
-        return "";
+
+        List<Microblog> blogByManys = microblogService.getBlogByManyID(articleIds);
+        Map<String,Object> returnMap = new HashMap<String,Object>();
+        returnMap.put("code","00");
+        returnMap.put("data",blogByManys);
+        return JSON.toJSONString(returnMap);
     }
 
 

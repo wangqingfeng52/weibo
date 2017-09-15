@@ -21,5 +21,5 @@ public interface MicroblogService {
 
     List<Microblog> getBlogByIDAndPage(long l, Pageable page);
 
-    void getBlogByManyID(String articleIds);
+    List<Microblog> getBlogByManyID(String articleIds);
 }

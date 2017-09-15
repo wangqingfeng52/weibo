@@ -17,5 +17,5 @@ public interface UserService {
 
     void md5Password(User user);
 
-    public User getPersonByUserNameAndPassword(String userName,String password);
+    public User getUserByUserNameAndPassword(String userName,String password);
 }

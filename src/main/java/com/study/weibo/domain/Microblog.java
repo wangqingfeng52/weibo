@@ -23,10 +23,10 @@ public class Microblog {
     private Long owner;
 
     //创建时间
-    private Long posted_on;
+    private String posted_on;
 
     //最后一次修改时间
-    private Long update_time;
+    private String update_time;
 
     public Microblog() {
     }
@@ -72,22 +72,33 @@ public class Microblog {
     }
 
     @Column(name = "CREATE_TIME")
-    public Long getPosted_on() {
+    public String getPosted_on() {
         return posted_on;
     }
 
-    public void setPosted_on(Long posted_on) {
+    public void setPosted_on(String posted_on) {
         this.posted_on = posted_on;
     }
 
     @Column(name = "UPDATE_TIME")
-    public Long getUpdate_time() {
+    public String getUpdate_time() {
         return update_time;
     }
 
-    public void setUpdate_time(Long update_time) {
+    public void setUpdate_time(String update_time) {
         this.update_time = update_time;
     }
 
+    @Override
+    public String toString() {
+        return "Microblog{" +
+                "articleId=" + articleId +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", owner=" + owner +
+                ", posted_on='" + posted_on + '\'' +
+                ", update_time='" + update_time + '\'' +
+                '}';
+    }
 }
 

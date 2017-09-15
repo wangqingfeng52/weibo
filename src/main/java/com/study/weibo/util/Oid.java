@@ -10,17 +10,10 @@ import java.util.regex.Pattern;
  */
 @Component
 public class Oid {
-    UUID uuid = UUID.randomUUID();
 
     public String getOid(){
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 
 
-    public static void main(String args[]){
-
-        String ss = "insert into values (1,',')";
-        String[] split = ss.split(Pattern.quote(","));
-        System.out.println(split.length);
-    }
 }

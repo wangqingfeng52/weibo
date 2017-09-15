@@ -12,7 +12,7 @@ public class WeiboApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WeiboApplication.class, args);
 	}
-
+/*
 	@Bean
 	public EmbeddedServletContainerCustomizer containerCustomizer(){
 		return new EmbeddedServletContainerCustomizer() {
@@ -21,7 +21,7 @@ public class WeiboApplication {
 				container.setSessionTimeout(1800);//单位为S
 			}
 		};
-	}
+	}*/
 
 
 }

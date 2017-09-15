@@ -2,6 +2,7 @@ package com.study.weibo.repository.impl;
 
 import com.study.weibo.domain.Microblog;
 import com.study.weibo.repository.UserDealBlogRepository;
+import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

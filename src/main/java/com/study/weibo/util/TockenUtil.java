@@ -26,7 +26,7 @@ public class TockenUtil {
             try{
                 Map map = JSON.parseObject(o.toString(), Map.class);
                 Object tokenSession = map.get("token");
-                if(!tokenSession.toString().equals(token)){
+                if(tokenSession==null || !tokenSession.toString().equals(token)){
                     flag = false;
                 }
             }catch (Exception e){
