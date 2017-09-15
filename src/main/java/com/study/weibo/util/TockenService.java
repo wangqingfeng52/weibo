@@ -20,7 +20,7 @@ public class TockenService {
     private RedisService redisService;
 
     public boolean isToken(String userid, String token){
-        Object o = redisService.get(Context.USER_BLOG+userid);
+        Object o = redisService.get(Context.USER_LOGIN+userid);
         boolean flag = true;
         if(o==null){
             flag = false;
@@ -42,7 +42,7 @@ public class TockenService {
 
 
     public void putToken(String userid,String token,long timeLimit){
-        redisService.set(Context.USER_BLOG+userid,token,timeLimit);
+        redisService.set(Context.USER_LOGIN+userid,token,timeLimit);
     }
 
     public Object getToken(String userid){

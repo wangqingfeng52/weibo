@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 public class Context {
     public static String USER_LOGIN ="user_login_";
     public static String USER_BLOG ="user_blogs_";
-    @Value(value = "redis.cache.blog")
-    public static boolean REDIS_CACHE_BLOG;
 
     public static String BLOG_ID = "blog_id_";
 }

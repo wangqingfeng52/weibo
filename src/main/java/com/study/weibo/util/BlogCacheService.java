@@ -34,7 +34,7 @@ public class BlogCacheService {
     public void saveBlog(Microblog bolg) {
         try{
             redisService.set(Context.BLOG_ID+bolg.getArticleId(),JSON.toJSONString(bolg));
-            redisService.hmSet(Context.USER_BLOG+bolg.getArticleId(),bolg.getArticleId(), JSON.toJSONString(bolg));
+            redisService.hmSet(Context.USER_BLOG+bolg.getOwner(),bolg.getArticleId()+"", JSON.toJSONString(bolg));
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -43,7 +43,7 @@ public class BlogCacheService {
     public void deleteBlogByID(Microblog bolg) {
         try{
             redisService.remove(Context.BLOG_ID+bolg.getArticleId());
-            redisService.hmDel(Context.USER_BLOG+bolg.getOwner(),bolg.getArticleId());
+            redisService.hmDel(Context.USER_BLOG+bolg.getOwner(),bolg.getArticleId()+"");
         }catch (Exception e){
             e.printStackTrace();
         }
